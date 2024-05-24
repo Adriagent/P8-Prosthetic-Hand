@@ -1,1 +1,1 @@
-# P8---Prosthetic-Hand
+# P8-Prosthetic-Hand
