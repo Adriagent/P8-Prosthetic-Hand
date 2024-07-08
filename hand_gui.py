@@ -288,7 +288,6 @@ class MainWindow(QMainWindow):
             print(f"{msg} - detection: {self.zero_thread.color_percentage*100:.2f} %")
 
             if self.zero_thread.color_percentage >= 0.10 and self.done == False:
-                print("awa")
                 pos = self.sliders[2].minimum() + 60
                 self.done = True
                 self.command_signal.emit(f"set_motor_position({pos}, [{2}])")
@@ -299,9 +298,8 @@ class MainWindow(QMainWindow):
                 self.command_signal.emit(f"set_motor_position({pos}, [{2}])")
 
         else:
-            # print(msg)
+            print(msg)
             # print(self.zero_thread.motors)
-            print(load)
 
         self.update_frame(image)
 
@@ -572,13 +570,15 @@ class MainWindow(QMainWindow):
         elif btn.text() == "Lateral pinch Grasp": ...
 
         elif btn.text() == "Open Fingers":
-            self.command_signal.emit(f"set_torque(0, {[self.L_AND_R, self.MIDDLE, self.INDEX]})")
-            self.command_signal.emit(f"set_mode(0, {[self.L_AND_R, self.MIDDLE, self.INDEX]})")
-            self.command_signal.emit(f"set_torque(1, {[self.L_AND_R, self.MIDDLE, self.INDEX]})")
+            self.command_signal.emit(f"set_torque(0, {[self.L_AND_R, self.MIDDLE, self.INDEX, self.THUMB, self.HINCH]})")
+            self.command_signal.emit(f"set_mode(0, {[self.L_AND_R, self.MIDDLE, self.INDEX, self.THUMB, self.HINCH]})")
+            self.command_signal.emit(f"set_torque(1, {[self.L_AND_R, self.MIDDLE, self.INDEX, self.THUMB, self.HINCH]})")
 
             self.command_signal.emit(f"set_motor_position({self.sliders[1].maximum()}, {[self.L_AND_R]})")
             self.command_signal.emit(f"set_motor_position({self.sliders[2].minimum()}, {[self.MIDDLE]})")
             self.command_signal.emit(f"set_motor_position({self.sliders[3].minimum()}, {[self.INDEX]})")
+            self.command_signal.emit(f"set_motor_position({self.sliders[4].minimum()}, {[self.THUMB]})")
+            self.command_signal.emit(f"set_motor_position({self.sliders[0].minimum()}, {[self.HINCH]})")
 
         elif btn.text() == "Close Fingers":
             self.command_signal.emit(f"set_torque(0, {[self.L_AND_R, self.MIDDLE, self.INDEX]})")
@@ -621,6 +621,7 @@ class MainWindow(QMainWindow):
     def torque_btn_pressed(self):
         btn = self.sender()
         id = btn.property("id")
+        print(id)
         motor_id = id if id < 5 else id -5
         btn_pos = id < 5
         mode = btn.property("mode")
@@ -810,6 +811,7 @@ class Zero_Thread(QThread, Client):
 
         for i, mode in enumerate(modes):
             self.motors[i]["mode"] = int(mode)
+
 
         self.DataUpdate.emit(msg, img)
 

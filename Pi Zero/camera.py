@@ -6,30 +6,34 @@ class Zero_Camera():
 
     def __init__(self):
         self.picam2 = Picamera2()
-        self.buffer = io.BytesIO()  # Reusable buffer
-        
-        self.set_camera_config("YUV420")        
-        # self.set_camera_config()        
+        self.set_camera_config() # "YUV420"
 
-    def set_camera_config(self, format="YUV420", size=(640, 480)):
+        self.last_frame = None
+        self.last_buffer_data = None
+
+    def set_camera_config(self, format="BGR888", size=(640,480), quality=50):
         config = self.picam2.create_video_configuration()
-        config["main"]["size"] = size
-        config["main"]["format"] = format
-        config["controls"]['FrameRate'] = 120
+        config["main"]["size"]          = size
+        config["main"]["format"]        = format
+        self.picam2.options['quality']  = quality  # JPEG quality (0 - 100)
 
         self.picam2.configure(config)
         self.picam2.start()
 
+        time.sleep(1)
+        print("[#]: Camera Ready!")
+
     def get_frame(self):
-        return self.picam2.capture_array()
+        self.last_frame = self.picam2.capture_array()
+        return self.last_frame
 
     def get_buffer_data(self):
-        img = self.picam2.capture_array()
-        image = Image.fromarray(img)
-        image.save(self.buffer, format='JPEG', quality=50)
-        self.buffer.seek(0)
+        buffer = io.BytesIO()
+        self.picam2.capture_file(buffer, format='jpeg')
+        buffer.seek(0)
+        self.last_buffer_data = buffer.getvalue()
 
-        return self.buffer.getvalue()
+        return self.last_buffer_data
     
     def __del__(self):
         if self.picam2.started:

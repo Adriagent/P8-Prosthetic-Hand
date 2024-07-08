@@ -8,7 +8,7 @@ if __name__ == "__main__":
         while True:
             start = time.time()
 
-            msg = "get_motor_position()"
+            msg = "get_mode()"
 
             cli.send_msg(msg)
             msg, img = cli.get_jpg()
